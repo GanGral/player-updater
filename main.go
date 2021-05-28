@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	tool "player-updater/player"
+	"player-updater/tool"
 
 	"github.com/gorilla/mux"
 )
