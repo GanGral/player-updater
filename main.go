@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"player-updater/player"
+	tool "player-updater/player"
 
 	"github.com/gorilla/mux"
 )
@@ -25,10 +25,11 @@ func handleRequests() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", homePage)
-	router.HandleFunc("/profiles/clientId/{macaddress}", player.HandleUpdate).Methods("PUT")
+	router.HandleFunc("/profiles/clientId/{macaddress}", tool.HandleUpdate).Methods("PUT")
 	log.Fatal(http.ListenAndServe(":8457", router))
 }
 func main() {
+	tool.Init()
 	handleRequests()
 }
 
