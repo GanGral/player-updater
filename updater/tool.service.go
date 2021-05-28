@@ -1,4 +1,4 @@
-package tool
+package updater
 
 import (
 	"encoding/csv"
@@ -16,10 +16,14 @@ const filename = "players.csv"
 
 var macAddresses []string
 
+//GetAddresses: Returns the slice of available mac addresses from csv file.
+func GetAddresses() []string {
+	return macAddresses
+}
 func Init() {
 	readAddresses()
-	fmt.Println(macAddresses)
-	fmt.Println(macAddresses[0])
+	//fmt.Println(macAddresses)
+	//fmt.Println(macAddresses[0])
 }
 
 //reads the Csv file. File should exist in the root of the tool
@@ -54,11 +58,11 @@ func readAddresses() {
 }
 
 //GetLatestVersion: returns latest player version
-func GetLatestVersion() Player {
+func GetLatestVersion(path string) Player {
 
 	var CurrentProfile Player
 	// Open our jsonFile
-	jsonFile, err := os.Open("currentVersion.json")
+	jsonFile, err := os.Open(path)
 	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
@@ -119,8 +123,9 @@ func processRequest(params map[string]string, r *http.Request, w http.ResponseWr
 	if macFound {
 
 		verifyBody(r, w)
-
-		json.NewEncoder(w).Encode(GetLatestVersion()) //return latest player version back in the response
+		//TODO:
+		//shouldn't get version back if verification fails
+		//json.NewEncoder(w).Encode(GetLatestVersion()) //return latest player version back in the response
 
 	} else {
 		//no such mac address

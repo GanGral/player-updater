@@ -1,4 +1,4 @@
-package tool
+package updater
 
 type Application struct {
 	ApplicationID string `json:"applicationId"`
