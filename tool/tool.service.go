@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +19,7 @@ var macAddresses []string
 func Init() {
 	readAddresses()
 	fmt.Println(macAddresses)
+	fmt.Println(macAddresses[0])
 }
 
 //reads the Csv file. File should exist in the root of the tool
@@ -32,76 +34,141 @@ func readCsv() *os.File {
 }
 
 func readAddresses() {
-	macAddresses = make([]string, 10)
+	macAddresses = make([]string, 0, 10)
 	macFile := readCsv()
 	macFileReader, err := csv.NewReader(macFile).ReadAll()
 	if err != nil {
 		fmt.Println(err)
 	}
-	for i, mac := range macFileReader {
-		fmt.Println(i)
-		macAddresses = append(macAddresses, mac[i++])
+
+	for i := 1; i < len(macFileReader); i++ {
+		macAddresses = append(macAddresses, macFileReader[i][0])
 	}
+
+	/* 	for i, mac := range macFileReader {
+		fmt.Println(i)
+
+	} */
+	defer macFile.Close()
 
 }
 
 //GetLatestVersion: returns latest player version
 func GetLatestVersion() Player {
-	CurrentProfile := Player{
-		Profile: Profile{
 
-			Applications: []Application{
-				{ApplicationID: "555", Version: "53333=4"},
-				{ApplicationID: "-rumba", Version: "534"},
-			},
-		},
+	var CurrentProfile Player
+	// Open our jsonFile
+	jsonFile, err := os.Open("currentVersion.json")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
 	}
+	fmt.Println("Successfully Opened currentVersion.json")
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	json.Unmarshal(byteValue, &CurrentProfile)
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	/*
+		CurrentProfile := Player{
+			Profile: Profile{
+
+				Applications: []Application{
+					{ApplicationID: "555", Version: "53333=4"},
+					{ApplicationID: "-rumba", Version: "534"},
+				},
+			},
+		} */
 	return CurrentProfile
 }
 
 //PUT request handler to handle player update request
 func HandleUpdate(w http.ResponseWriter, r *http.Request) {
-	//Setting response header
-	w.Header().Set("content-type", "application/json")
 
-	//reading input parameters
-	params := mux.Vars(r)
-
-	/*Required headers to verify:
+	/*Required request headers to verify:
 	x-client-id: required
 	x-authentication-token: required
+
+	Requied response headers:
+	content-type: application/json
 	*/
 
-	var playerProfile Player
+	w.Header().Set("content-type", "application/json")
 
-	err := json.NewDecoder(r.Body).Decode(&playerProfile)
+	params := mux.Vars(r)                         //reading input parameters
+	authorized := requestAuthentication(r.Header) //First authorization check
 
-	if err != nil {
-		log.Print(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	canProceed := requestVerification(r.Header)
+	if authorized {
 
-	if canProceed {
-
-		if params["macaddress"] == "388" {
-
-			json.NewEncoder(w).Encode(GetLatestVersion())
-
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-			fmt.Fprintf(w, "profile of client %s does not exist", params["macaddress"])
-		}
+		processRequest(params, r, w)
 
 	} else {
+		//no token/clientId provided
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, "invalid clientId or token supplied")
 	}
 
 }
 
-func requestVerification(header http.Header) bool {
+func processRequest(params map[string]string, r *http.Request, w http.ResponseWriter) {
+
+	_, macFound := find(macAddresses, params["macaddress"]) //check if macaddress is in the slice.
+
+	if macFound {
+
+		verifyBody(r, w)
+
+		json.NewEncoder(w).Encode(GetLatestVersion()) //return latest player version back in the response
+
+	} else {
+		//no such mac address
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "profile of client %s does not exist", params["macaddress"])
+	}
+}
+
+func find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+func verifyBody(r *http.Request, w http.ResponseWriter) {
+	//Try decode the body into accepted Player object
+
+	var playerProfile Player
+
+	err := json.NewDecoder(r.Body).Decode(&playerProfile)
+	if err != nil {
+
+		log.Print(err)
+		w.WriteHeader(http.StatusBadRequest)
+
+	}
+	//attempting to verify body for errors through reflect TODO:
+	/* 	body, err := ioutil.ReadAll(r.Body)
+	   	if err != nil {
+	   		log.Print(err)
+	   		//w.WriteHeader(http.StatusBadRequest)
+
+	   	} */
+
+	/* 	err = playerProfile.UnmarshalJSON(body)
+
+	   	if err != nil {
+	   		log.Print(err)
+	   		w.WriteHeader(http.StatusBadRequest)
+
+	   	} */
+
+	//json.NewEncoder(w).Encode(playerProfile) //debugging purposes
+}
+func requestAuthentication(header http.Header) bool {
 	okId := verifyClientID(header)
 	okToken := verifyToken(header)
 
@@ -115,6 +182,9 @@ func verifyClientID(header http.Header) bool {
 	_, okId := header["X-Client-Id"] //using canonical here
 
 	return okId
+
+}
+func verifyProfile(player *Player) {
 
 }
 
