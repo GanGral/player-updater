@@ -4,10 +4,10 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"player-updater/common"
 
 	"github.com/gorilla/mux"
 )
@@ -16,14 +16,38 @@ const filename = "players.csv"
 
 var macAddresses []string
 
-//GetAddresses: Returns the slice of available mac addresses from csv file.
-func GetAddresses() []string {
-	return macAddresses
-}
 func Init() {
 	readAddresses()
 	//fmt.Println(macAddresses)
 	//fmt.Println(macAddresses[0])
+}
+
+//HandleUpdate: PUT request handler to process music player update
+func HandleUpdate(w http.ResponseWriter, r *http.Request) {
+
+	/*Required request headers to verify:
+	x-client-id: required
+	x-authentication-token: required
+
+	Requied response headers:
+	content-type: application/json
+	*/
+
+	w.Header().Set("content-type", "application/json")
+
+	params := mux.Vars(r)                         //reading input parameters
+	authorized := requestAuthentication(r.Header) //First authorization check
+
+	if authorized {
+
+		processRequest(params, r, w)
+
+	} else {
+		//no token/clientId provided
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprint(w, "invalid clientId or token supplied")
+	}
+
 }
 
 //reads the Csv file. File should exist in the root of the tool
@@ -57,67 +81,9 @@ func readAddresses() {
 
 }
 
-//GetLatestVersion: returns latest player version
-func GetLatestVersion(path string) Player {
-
-	var CurrentProfile Player
-	// Open our jsonFile
-	jsonFile, err := os.Open(path)
-	// if we os.Open returns an error then handle it
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Successfully Opened currentVersion.json")
-
-	// read our opened jsonFile as a byte array.
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal(byteValue, &CurrentProfile)
-	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
-
-	/*
-		CurrentProfile := Player{
-			Profile: Profile{
-
-				Applications: []Application{
-					{ApplicationID: "555", Version: "53333=4"},
-					{ApplicationID: "-rumba", Version: "534"},
-				},
-			},
-		} */
-	return CurrentProfile
-}
-
-//PUT request handler to handle player update request
-func HandleUpdate(w http.ResponseWriter, r *http.Request) {
-
-	/*Required request headers to verify:
-	x-client-id: required
-	x-authentication-token: required
-
-	Requied response headers:
-	content-type: application/json
-	*/
-
-	w.Header().Set("content-type", "application/json")
-
-	params := mux.Vars(r)                         //reading input parameters
-	authorized := requestAuthentication(r.Header) //First authorization check
-
-	if authorized {
-
-		processRequest(params, r, w)
-
-	} else {
-		//no token/clientId provided
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, "invalid clientId or token supplied")
-	}
-
-}
-
 func processRequest(params map[string]string, r *http.Request, w http.ResponseWriter) {
 
+	//We should check for validity of macAddress. For now just verifying it exists in common csv file.
 	_, macFound := find(macAddresses, params["macaddress"]) //check if macaddress is in the slice.
 
 	if macFound {
@@ -146,7 +112,7 @@ func find(slice []string, val string) (int, bool) {
 func verifyBody(r *http.Request, w http.ResponseWriter) {
 	//Try decode the body into accepted Player object
 
-	var playerProfile Player
+	var playerProfile common.Player
 
 	err := json.NewDecoder(r.Body).Decode(&playerProfile)
 	if err != nil {
@@ -189,7 +155,7 @@ func verifyClientID(header http.Header) bool {
 	return okId
 
 }
-func verifyProfile(player *Player) {
+func verifyProfile(player *common.Player) {
 
 }
 

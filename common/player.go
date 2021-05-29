@@ -1,4 +1,4 @@
-package updater
+package common
 
 type Application struct {
 	ApplicationID string `json:"applicationId"`
