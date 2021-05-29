@@ -21,7 +21,10 @@ func Init() {
 	//fmt.Println(macAddresses[0])
 }
 
-//HandleUpdate: PUT request handler to process music player update
+// HandleUpdate request handler to process music player update.
+// 200 Success is returned together with new Player version profile.
+// 404 If no such macaddress exists
+// 409 If the update profile is not in expected format
 func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	/*Required request headers to verify:
@@ -63,6 +66,8 @@ func processRequest(params map[string]string, r *http.Request, w http.ResponseWr
 			w.WriteHeader(http.StatusConflict)
 			fmt.Fprintf(w, `child \"profile\" fails because [child \"applications\" fails because [\"applications\" is required]]`)
 		} else {
+
+			//this returns the updated version of the player upon success
 			json.NewEncoder(w).Encode(common.GetLatestVersion(currentVersionPath)) //return latest player version back in the response
 		}
 

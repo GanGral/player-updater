@@ -2,6 +2,7 @@ package updater
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"player-updater/common"
@@ -19,6 +20,8 @@ func verifyBody(r *http.Request) error {
 
 	}
 
+	err = verifyProfile(&playerProfile)
+
 	//json.NewEncoder(w).Encode(playerProfile) //debugging purposes
 	return err
 }
@@ -33,32 +36,31 @@ func requestAuthentication(header http.Header) bool {
 	return false
 }
 func verifyClientID(header http.Header) bool {
-	_, okId := header["X-Client-Id"] //using canonical here
 
+	clientId, okId := header["X-Client-Id"] //using canonical here
+	if clientId[0] == "" {
+		okId = false
+	}
+
+	//fmt.Println(clientId, okId)
 	return okId
 
 }
-func verifyProfile(player *common.Player) {
-	//attempting to verify body for errors through reflect TODO:
-	/* 	body, err := ioutil.ReadAll(r.Body)
-	   	if err != nil {
-	   		log.Print(err)
-	   		//w.WriteHeader(http.StatusBadRequest)
+func verifyProfile(player *common.Player) error {
 
-	   	} */
-
-	/* 	err = playerProfile.UnmarshalJSON(body)
-
-	   	if err != nil {
-	   		log.Print(err)
-	   		w.WriteHeader(http.StatusBadRequest)
-
-	   	} */
+	if player.Profile.Applications == nil {
+		err := errors.New("invalid body")
+		return err
+	}
+	return nil
 
 }
 
 func verifyToken(header http.Header) bool {
-	_, okToken := header["X-Authentication-Token"] //using canonical here
+	token, okToken := header["X-Authentication-Token"] //using canonical here
+	if token[0] == "" {
+		okToken = false
+	}
 
 	return okToken
 

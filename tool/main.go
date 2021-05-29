@@ -16,12 +16,10 @@ func main() {
 	// curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer b7d03a6947b217efb6f3ec3bd3504582" -d '{"type":"A","name":"www","data":"162.10.66.0","priority":null,"port":null,"weight":null}' "https://api.digitalocean.com/v2/domains/example.com/records"
 	addressList := common.ReadAddresses("../players.csv")
 	currentVersion := common.GetLatestVersion("../currentVersion.json")
-	authParams := getAuthParams("/tool/authparams.json")
-	//	fmt.Print(addressList)
+	authParams := getAuthParams("../tool/authparams.json")
 
 	for _, mac := range addressList {
 		runUpdate(currentVersion, mac, authParams)
-
 	}
 
 }
@@ -42,6 +40,8 @@ func runUpdate(currentVersion common.Player, mac string, authParams AuthParams) 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Client-Id", authParams.ClientId)
 	req.Header.Set("X-Authentication-Token", authParams.Token)
+
+	fmt.Println(req.Header)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
