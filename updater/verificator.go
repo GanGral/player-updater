@@ -18,21 +18,6 @@ func verifyBody(r *http.Request) error {
 		log.Print(err)
 
 	}
-	//attempting to verify body for errors through reflect TODO:
-	/* 	body, err := ioutil.ReadAll(r.Body)
-	   	if err != nil {
-	   		log.Print(err)
-	   		//w.WriteHeader(http.StatusBadRequest)
-
-	   	} */
-
-	/* 	err = playerProfile.UnmarshalJSON(body)
-
-	   	if err != nil {
-	   		log.Print(err)
-	   		w.WriteHeader(http.StatusBadRequest)
-
-	   	} */
 
 	//json.NewEncoder(w).Encode(playerProfile) //debugging purposes
 	return err
@@ -54,6 +39,21 @@ func verifyClientID(header http.Header) bool {
 
 }
 func verifyProfile(player *common.Player) {
+	//attempting to verify body for errors through reflect TODO:
+	/* 	body, err := ioutil.ReadAll(r.Body)
+	   	if err != nil {
+	   		log.Print(err)
+	   		//w.WriteHeader(http.StatusBadRequest)
+
+	   	} */
+
+	/* 	err = playerProfile.UnmarshalJSON(body)
+
+	   	if err != nil {
+	   		log.Print(err)
+	   		w.WriteHeader(http.StatusBadRequest)
+
+	   	} */
 
 }
 
