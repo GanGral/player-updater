@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -25,15 +26,33 @@ func GetLatestVersion(path string) Player {
 	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
 
-	/*
-		CurrentProfile := Player{
-			Profile: Profile{
-
-				Applications: []Application{
-					{ApplicationID: "555", Version: "53333=4"},
-					{ApplicationID: "-rumba", Version: "534"},
-				},
-			},
-		} */
 	return CurrentProfile
+}
+
+//reads the Csv file. File should exist in the root of the tool
+func readCsv(path string) *os.File {
+	csvFile, err := os.Open(path)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Successfully Opened CSV file")
+	//defer csvFile.Close()
+	return csvFile
+}
+
+func ReadAddresses(path string) []string {
+	macAddresses := make([]string, 0, 10)
+	macFile := readCsv(path)
+	macFileReader, err := csv.NewReader(macFile).ReadAll()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for i := 1; i < len(macFileReader); i++ {
+		macAddresses = append(macAddresses, macFileReader[i][0])
+	}
+
+	defer macFile.Close()
+	return macAddresses
+
 }

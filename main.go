@@ -36,10 +36,6 @@ func main() {
 	handleRequests()
 }
 
-func curlToGo() {
-
-}
-
 /* func handleProductReport(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
