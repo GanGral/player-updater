@@ -27,7 +27,7 @@ func handleRequests() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", homePage)
-	router.HandleFunc("/profiles/clientId/{macaddress}", updater.HandleUpdate).Methods("PUT")
+	router.HandleFunc("/profiles/clientId:{macaddress}", updater.HandleUpdate).Methods("PUT")
 	log.Fatal(http.ListenAndServe(":8457", router))
 
 }

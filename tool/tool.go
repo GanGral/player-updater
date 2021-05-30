@@ -19,11 +19,11 @@ func main() {
 	authParams := getAuthParams("../tool/authparams.json")
 
 	for _, mac := range addressList {
-		runUpdate(currentVersion, mac, authParams)
+		RunUpdate(currentVersion, mac, authParams)
 	}
 
 }
-func runUpdate(currentVersion common.Player, mac string, authParams AuthParams) {
+func RunUpdate(currentVersion common.Player, mac string, authParams AuthParams) {
 
 	payloadBytes, err := json.Marshal(currentVersion)
 	if err != nil {
@@ -32,7 +32,7 @@ func runUpdate(currentVersion common.Player, mac string, authParams AuthParams) 
 	}
 	body := bytes.NewReader(payloadBytes)
 
-	req, err := http.NewRequest("PUT", "http://localhost:8457/profiles/clientId/"+mac, body)
+	req, err := http.NewRequest("PUT", "http://localhost:8457/profiles/clientId:"+mac, body)
 
 	if err != nil {
 		fmt.Print(err)

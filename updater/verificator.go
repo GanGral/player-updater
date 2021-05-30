@@ -48,6 +48,10 @@ func verifyClientID(header http.Header) bool {
 }
 func verifyProfile(player *common.Player) error {
 
+	//if player.Profile.Applications.Application[1].Version < targerPlayerVersion{
+	//don't upgrade
+	//}
+
 	if player.Profile.Applications == nil {
 		err := errors.New("invalid body")
 		return err

@@ -9,14 +9,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const playersPath = "players.csv"
+const destAddresses = "players.csv"
 const currentVersionPath = "currentVersion.json"
+const headerContentKey = "content-type"
+const headerContentValue = "application/json"
 
 var macAddresses []string
 
 func Init() {
 
-	macAddresses = common.ReadAddresses(playersPath)
+	macAddresses = common.ReadAddresses(destAddresses)
 	fmt.Println(macAddresses)
 	//fmt.Println(macAddresses[0])
 }
@@ -35,7 +37,7 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	content-type: application/json
 	*/
 
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set(headerContentKey, headerContentValue)
 
 	params := mux.Vars(r)                         //reading input parameters
 	authorized := requestAuthentication(r.Header) //First authorization check
