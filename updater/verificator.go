@@ -1,5 +1,15 @@
 package updater
 
+// verificator.go
+
+// Contains function to verify incoming requests.
+// Required request headers to verify:
+// x-client-id: required
+// x-authentication-token: required
+
+// Required response headers:
+// content-type: application/json
+//
 import (
 	"encoding/json"
 	"errors"
@@ -62,6 +72,9 @@ func verifyProfile(player *common.Player) error {
 
 func verifyToken(header http.Header) bool {
 	token, okToken := header["X-Authentication-Token"] //using canonical here
+	if !okToken {
+		return okToken
+	}
 	if token[0] == "" {
 		okToken = false
 	}

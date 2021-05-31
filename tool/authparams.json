@@ -1,5 +1,7 @@
-
 {
-    "x-authentication-token": "45dfsd", 
+    "token": {
+        "x-authentication-token": "45dfsd",
+        "expired": "false"
+    },
     "x-client-id": "31"
 }

@@ -11,9 +11,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//Structure to construct for authentication
 type AuthParams struct {
-	Token    string `json:"x-authentication-token"`
-	ClientId string `json:"x-client-id"`
+	ClientToken Token  `json:"token"`
+	ClientId    string `json:"x-client-id"`
+}
+type Token struct {
+	Token   string `json:"x-authentication-token"`
+	Expired bool   `json:"expired"`
 }
 
 func TestUpdateHandler(t *testing.T) {
@@ -32,9 +37,23 @@ func TestUpdateHandler(t *testing.T) {
 		body       *bytes.Reader
 	}{
 		{
-			name:       "without authentication",
+			name:       "without token and clientId",
 			method:     http.MethodPut,
 			input:      &AuthParams{},
+			want:       "invalid clientId or token supplied",
+			statusCode: http.StatusUnauthorized,
+			body:       expectedBody,
+		},
+		{
+			name:   "expired token",
+			method: http.MethodPut,
+			input: &AuthParams{
+				ClientId: "dkd",
+				ClientToken: Token{
+					Token:   "skjd",
+					Expired: true,
+				},
+			},
 			want:       "invalid clientId or token supplied",
 			statusCode: http.StatusUnauthorized,
 			body:       expectedBody,
@@ -44,9 +63,12 @@ func TestUpdateHandler(t *testing.T) {
 			method: http.MethodPut,
 			input: &AuthParams{
 				ClientId: "dkd",
-				Token:    "skjd",
+				ClientToken: Token{
+					Token:   "skjd",
+					Expired: false,
+				},
 			},
-			want:       `{"profile":{"applications":[{"applicationId":"music_app","version":"v1.4.10"},{"applicationId":"diagnostic_app","version":"v1.2.6"},{"applicationId":"settings_app","version":"v1.1.5"}]}} `,
+			want:       `{"profile":{"applications":[{"applicationId":"music_app","version":"v1.4.10"},{"applicationId":"diagnostic_app","version":"v1.2.6"},{"applicationId":"settings_app","version":"v1.1.5"}]}}`,
 			statusCode: http.StatusOK,
 			body:       expectedBody,
 		},
@@ -55,7 +77,10 @@ func TestUpdateHandler(t *testing.T) {
 			method: http.MethodPut,
 			input: &AuthParams{
 				ClientId: "ds",
-				Token:    "dsdd",
+				ClientToken: Token{
+					Token:   "skjd",
+					Expired: false,
+				},
 			},
 			want:       `child \"profile\" fails because [child \"applications\" fails because [\"applications\" is required]]`,
 			statusCode: http.StatusConflict,
@@ -69,7 +94,11 @@ func TestUpdateHandler(t *testing.T) {
 			responseRecorder := httptest.NewRecorder()
 			request.Header.Set("Content-Type", "application/json")
 			request.Header.Set("X-Client-Id", tc.input.ClientId)
-			request.Header.Set("X-Authentication-Token", tc.input.Token)
+
+			if !tc.input.ClientToken.Expired {
+				request.Header.Set("X-Authentication-Token", tc.input.ClientToken.Token)
+			}
+
 			//context.Set(r, 0, 1)
 
 			Router().ServeHTTP(responseRecorder, request)
@@ -80,6 +109,7 @@ func TestUpdateHandler(t *testing.T) {
 			}
 
 			if strings.TrimSpace(responseRecorder.Body.String()) != tc.want {
+
 				t.Errorf("Want '%s', got '%s'", tc.want, responseRecorder.Body)
 			}
 		})

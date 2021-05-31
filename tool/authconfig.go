@@ -9,8 +9,12 @@ import (
 
 //Structure to construct for authentication
 type AuthParams struct {
-	Token    string `json:"x-authentication-token"`
-	ClientId string `json:"x-client-id"`
+	ClientToken Token  `json:"token"`
+	ClientId    string `json:"x-client-id"`
+}
+type Token struct {
+	Token   string `json:"x-authentication-token"`
+	Expired bool   `json:"expired"`
 }
 
 /*Authentication parameters.

@@ -1,5 +1,7 @@
 package updater
 
+//updater.go
+// contains handlers to process incoming requests.
 import (
 	"encoding/json"
 	"fmt"
@@ -9,32 +11,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// hard-coded, we expect the files to be local to the updater
 const destAddresses = "players.csv"
-const currentVersionPath = "currentVersion.json"
+const currentProfilePath = "currentVersion.json"
 const headerContentKey = "content-type"
 const headerContentValue = "application/json"
 
 var macAddresses []string
 
-/* func Init() {
-
-	fmt.Println(macAddresses)
-	//fmt.Println(macAddresses[0])
-} */
-
 // HandleUpdate request handler to process music player update.
 // 200 Success is returned together with new Player version profile.
 // 404 If no such macaddress exists
-// 409 If the update profile is not in expected format
+// 409 If the update profile is not in expected format or empty
+
 func HandleUpdate(w http.ResponseWriter, r *http.Request) {
-
-	/*Required request headers to verify:
-	x-client-id: required
-	x-authentication-token: required
-
-	Requied response headers:
-	content-type: application/json
-	*/
 
 	w.Header().Set(headerContentKey, headerContentValue)
 
@@ -64,16 +54,16 @@ func processRequest(params map[string]string, r *http.Request, w http.ResponseWr
 
 	if macFound {
 
+		//need to verify body before processing
 		err := verifyBody(r)
-		//TODO:
-		//shouldn't get version back if verification fails
+
 		if err != nil {
 			w.WriteHeader(http.StatusConflict)
 			fmt.Fprintf(w, `child \"profile\" fails because [child \"applications\" fails because [\"applications\" is required]]`)
 		} else {
 
-			//this returns the updated version of the player upon success
-			json.NewEncoder(w).Encode(common.GetLatestVersion(currentVersionPath)) //return latest player version back in the response
+			//Returns the updated version of the player upon success. Currently using mock version json.
+			json.NewEncoder(w).Encode(common.GetLatestVersion(currentProfilePath)) //return latest player version back in the response
 		}
 
 	} else {
@@ -83,7 +73,7 @@ func processRequest(params map[string]string, r *http.Request, w http.ResponseWr
 	}
 }
 
-//helper funcitons
+//helper funciton
 func find(slice []string, val string) (int, bool) {
 	for i, item := range slice {
 		if item == val {
