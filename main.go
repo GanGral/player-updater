@@ -32,7 +32,7 @@ func handleRequests() {
 
 }
 func main() {
-	updater.Init()
+	//updater.Init()
 	handleRequests()
 }
 

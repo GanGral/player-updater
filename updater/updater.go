@@ -16,12 +16,11 @@ const headerContentValue = "application/json"
 
 var macAddresses []string
 
-func Init() {
+/* func Init() {
 
-	macAddresses = common.ReadAddresses(destAddresses)
 	fmt.Println(macAddresses)
 	//fmt.Println(macAddresses[0])
-}
+} */
 
 // HandleUpdate request handler to process music player update.
 // 200 Success is returned together with new Player version profile.
@@ -55,6 +54,10 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func processRequest(params map[string]string, r *http.Request, w http.ResponseWriter) {
+
+	if len(macAddresses) == 0 {
+		macAddresses = common.ReadAddresses(destAddresses)
+	}
 
 	//We should check for validity of macAddress. For now just verifying it exists in common csv file.
 	_, macFound := find(macAddresses, params["macaddress"]) //check if macaddress is in the slice.

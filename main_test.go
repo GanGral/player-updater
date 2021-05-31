@@ -2,87 +2,94 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"player-updater/updater"
+	"strings"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
-func TestHandleUpdate(t *testing.T) {
-	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
-	// pass 'nil' as the third parameter.
+type AuthParams struct {
+	Token    string `json:"x-authentication-token"`
+	ClientId string `json:"x-client-id"`
+}
 
-	myJsonString := `{
-		"profile": {    
-		  "applications": [
-			{
-			  "applicationId": "music_app"
-			  "version": "v1.4.10"
+func TestUpdateHandler(t *testing.T) {
+
+	expectedBody := bytes.NewReader([]byte(`{"profile":{"applications":[{"applicationId":"music_app","version":"v1.4.10"},{"applicationId":"diagnostic_app","version":"v1.2.6"},{"applicationId":"settings_app","version":"v1.1.5"}]}}
+	`))
+
+	emptyBody := bytes.NewReader([]byte(""))
+
+	tt := []struct {
+		name       string
+		method     string
+		input      *AuthParams
+		want       string
+		statusCode int
+		body       *bytes.Reader
+	}{
+		{
+			name:       "without authentication",
+			method:     http.MethodPut,
+			input:      &AuthParams{},
+			want:       "invalid clientId or token supplied",
+			statusCode: http.StatusUnauthorized,
+			body:       expectedBody,
+		},
+		{
+			name:   "all good",
+			method: http.MethodPut,
+			input: &AuthParams{
+				ClientId: "dkd",
+				Token:    "skjd",
 			},
-			{
-			  "applicationId": "diagnostic_app",
-			  "version": "v1.2.6"
+			want:       `{"profile":{"applications":[{"applicationId":"music_app","version":"v1.4.10"},{"applicationId":"diagnostic_app","version":"v1.2.6"},{"applicationId":"settings_app","version":"v1.1.5"}]}} `,
+			statusCode: http.StatusOK,
+			body:       expectedBody,
+		},
+		{
+			name:   "with empty body",
+			method: http.MethodPut,
+			input: &AuthParams{
+				ClientId: "ds",
+				Token:    "dsdd",
 			},
-			{
-			  "applicationId": "settings_app",
-			  "version": "v1.1.5"
+			want:       `child \"profile\" fails because [child \"applications\" fails because [\"applications\" is required]]`,
+			statusCode: http.StatusConflict,
+			body:       emptyBody,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			request := httptest.NewRequest(tc.method, "/profiles/clientId:a1:bb:cc:dd:ee:ff", tc.body)
+			responseRecorder := httptest.NewRecorder()
+			request.Header.Set("Content-Type", "application/json")
+			request.Header.Set("X-Client-Id", tc.input.ClientId)
+			request.Header.Set("X-Authentication-Token", tc.input.Token)
+			//context.Set(r, 0, 1)
+
+			Router().ServeHTTP(responseRecorder, request)
+			//updater.HandleUpdate(responseRecorder, request)
+
+			if responseRecorder.Code != tc.statusCode {
+				t.Errorf("Want status '%d', got '%d'", tc.statusCode, responseRecorder.Code)
 			}
-		  ]
-		}
-	  }`
 
-	body := bytes.NewReader([]byte(myJsonString))
-
-	req, err := http.NewRequest("PUT", "http://localhost:8457/profiles/clientId:a2:bb:cc:dd:ee:ff", body)
-	if err != nil {
-		t.Error(err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Client-Id", "")
-	req.Header.Set("X-Authentication-Token", "dummy")
-
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
-	rr := httptest.NewRecorder()
-
-	_, err = http.DefaultClient.Do(req)
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	//handler := http.HandlerFunc(updater.HandleUpdate)
-
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
-	//handler.ServeHTTP(rr, req)
-
-	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
-
-	// Check the response body is what we expect.
-	expected := `{
-		"profile": {    
-		  "applications": [
-			{
-			  "applicationId": "music_app"
-			  "version": "v1.4.10"
-			},
-			{
-			  "applicationId": "diagnostic_app",
-			  "version": "v1.2.6"
-			},
-			{
-			  "applicationId": "settings_app",
-			  "version": "v1.1.5"
+			if strings.TrimSpace(responseRecorder.Body.String()) != tc.want {
+				t.Errorf("Want '%s', got '%s'", tc.want, responseRecorder.Body)
 			}
-		  ]
-		}
-	  }`
-	if rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
+		})
 	}
+
+}
+
+// setting up Router so we can properly handle the macaddress field through mux
+func Router() *mux.Router {
+	route := mux.NewRouter()
+	route.HandleFunc("/profiles/clientId:{macaddress}", updater.HandleUpdate)
+	return route
 }
