@@ -1,7 +1,7 @@
-package common
-
 //common.go
 // provides common functions used by updater tool and updater service.
+
+package common
 
 import (
 	"encoding/csv"

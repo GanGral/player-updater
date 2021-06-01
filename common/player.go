@@ -1,7 +1,7 @@
-package common
-
 //player.go
 // common player type structure used by updater service and updater tool
+
+package common
 
 type Application struct {
 	ApplicationID string `json:"applicationId"`
