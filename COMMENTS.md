@@ -16,9 +16,9 @@ I made this tool cross-platform, so Go is perfect, since we can build for number
 Unit tests are designed to test UpdateHandler for different scenarios to make sure 200, 409, 404, 401 error codes are thrown when expected.
 
 # Brief package overview
-### Updater Service contains request handler and verificator portion (updater.go, verificator.go). 
-### Updater Tool (Tool) is independent command line utility, so it has separate main package under /tool/, not related to Updater Service. 
-### Common package: provides common functions used by updater tool and updater service.
+##### Updater Service contains request handler and verificator portion (updater.go, verificator.go). 
+##### Updater Tool (Tool) is independent command line utility, so it has separate main package under /tool/, not related to Updater Service. 
+##### Common package: provides common functions used by updater tool and updater service.
 
 ### Documentation
 
@@ -30,11 +30,11 @@ The comments I used were intended to get the most of internal go doc functionali
 
 
 # Things to improve on
-Internal documentation
-Implement proper routing
-Implement proper token authentication
-500 Internal Server error is not returned to client.
-Improve tool to accept single MAC address.
+*Internal documentation
+*Implement proper routing
+*Implement proper token authentication
+*500 Internal Server error is not returned to client.
+*Improve tool to accept single MAC address.
 
 
 
