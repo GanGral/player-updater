@@ -36,6 +36,7 @@ The comments I used were intended to get the most of internal go doc functionali
 * Implement proper token authentication
 * 500 Internal Server error is not returned to client.
 * Improve tool to accept single MAC address.
+* Move server-side config into separate JSON.
 
 
 
