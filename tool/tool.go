@@ -1,7 +1,4 @@
-package main
-
-//tool.go
-
+//Updater Tool
 // interactive command line tool to perform updates of multiple player's profile.
 // sends PUT requests to updater service to initiate updates
 // Usage:
@@ -12,6 +9,7 @@ package main
 //        specifies the updater_service port (default 8457)
 //  -profile string
 //        Specify the location of json file with up-to-date player profile (default "../tool/currentVersion.json")
+package main
 
 import (
 	"bytes"
@@ -44,7 +42,7 @@ func main() {
 
 }
 
-// RunUpdate updates player profiles. Location is determined by mac address from provided list.
+// RunUpdate updates player profiles.
 func RunUpdate(currentVersion common.Player, mac string, authParams AuthParams, updaterPort int) {
 
 	payloadBytes, err := json.Marshal(currentVersion)

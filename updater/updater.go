@@ -1,7 +1,7 @@
-package updater
-
 //updater.go
 // contains handlers to process incoming requests.
+package updater
+
 import (
 	"encoding/json"
 	"fmt"
@@ -19,11 +19,10 @@ const headerContentValue = "application/json"
 
 var macAddresses []string
 
-// HandleUpdate request handler to process music player update.
-// 200 Success is returned together with new Player version profile.
-// 404 If no such macaddress exists
-// 409 If the update profile is not in expected format or empty
-
+//	HandleUpdate request handler to process music player update.
+//	Success is returned together with new Player version profile.
+//	If no such macaddress exists
+//	If the update profile is not in expected format or empty
 func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set(headerContentKey, headerContentValue)
@@ -43,6 +42,8 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//	processRequest verifies and processes requests. The successfull request would return back the updated player profile JSON in the body.
+//	handles 404, 401, 409 errors and reports to client
 func processRequest(params map[string]string, r *http.Request, w http.ResponseWriter) {
 
 	if len(macAddresses) == 0 {

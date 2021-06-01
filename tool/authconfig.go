@@ -1,5 +1,10 @@
 package main
 
+//authconfig.go
+// specifies the AuthParameters to be passed from client application.
+// Ideally the JWT tokens can be used and OAUTH implemented.
+// For the purpose of assignement a simple JSON structure auth parameters are used by updater tool.
+
 import (
 	"encoding/json"
 	"fmt"
@@ -17,10 +22,8 @@ type Token struct {
 	Expired bool   `json:"expired"`
 }
 
-/*Authentication parameters.
-Ideally should be retrieved through OAuth and not exposed, but for purpose of assignement this is a plain text JSON.
-*/
-
+//getAuthParams retrieves authentication parameters from provided JSON.
+//Ideally should be retrieved through OAuth and not exposed, but for purpose of assignement this is a plain text JSON.
 func getAuthParams(path string) AuthParams {
 
 	var authParams AuthParams

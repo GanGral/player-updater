@@ -1,15 +1,11 @@
-package updater
-
 // verificator.go
-
 // Contains function to verify incoming requests.
 // Required request headers to verify:
-// x-client-id: required
-// x-authentication-token: required
-
-// Required response headers:
-// content-type: application/json
+// X-client-id: required
+// X-authentication-token: required
 //
+package updater
+
 import (
 	"encoding/json"
 	"errors"
@@ -58,9 +54,9 @@ func verifyClientID(header http.Header) bool {
 }
 func verifyProfile(player *common.Player) error {
 
-	//if player.Profile.Applications.Application[1].Version < targerPlayerVersion{
-	//don't upgrade
-	//}
+	// TBD:
+	// target player version should be less then new version to initiate upgrade.
+	// Since no mock target players are implemented, so TBD.
 
 	if player.Profile.Applications == nil {
 		err := errors.New("invalid body")

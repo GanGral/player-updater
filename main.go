@@ -1,9 +1,8 @@
-package main
-
 //main.go
 
-//entry point for updater_service.Creates a HTTP listener on port 8487 to process PUT requests to "/profiles/clientId:{macaddress}".
+//Entry point for updater_service. Creates a HTTP listener on port 8487 to process PUT requests to "/profiles/clientId:{macaddress}".
 //Updater service processes HTTP requests to upgrade Players profile using their macaddresses.
+package main
 
 import (
 	"log"

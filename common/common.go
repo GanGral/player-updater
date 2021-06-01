@@ -1,5 +1,8 @@
 package common
 
+//common.go
+// provides common functions used by updater tool and updater service.
+
 import (
 	"encoding/csv"
 	"encoding/json"
@@ -8,7 +11,7 @@ import (
 	"os"
 )
 
-//GetLatestVersion: returns latest player version
+//GetLatestVersion returns latest player profile available
 func GetLatestVersion(path string) Player {
 
 	var CurrentProfile Player
@@ -40,6 +43,7 @@ func readCsv(path string) *os.File {
 	return csvFile
 }
 
+//ReadAddresses assembles the array of macaddreses from provided csv file path.
 func ReadAddresses(path string) []string {
 	macAddresses := make([]string, 0, 10)
 	macFile := readCsv(path)

@@ -1,5 +1,13 @@
 package main
 
+//Test for updater service UpdateHandler.
+
+// 5 tests are performed:
+// PUT request with no token/client id provided
+// PUT request with expired token
+// Successfull PUT request
+// Empty body PUT request
+
 import (
 	"bytes"
 	"net/http"
