@@ -26,7 +26,7 @@ Start updater_service.exe. This would open a local listener on port 8457 to acce
 PUT /profiles/clientId:{macaddress}
 ```
 ### Updater Tool
-Command line tool, which accepts the following parameters and executes PUT requests for each player, specified in csv file (macaddress list).
+Command line tool, which accepts the following parameters and forwards PUT requests to updater service for each player, specified in csv file (macaddress list).
 ```
   -csvpath string
         Specify the path to the player's Mac Addresses csv file (default "../players.csv")
