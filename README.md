@@ -1,7 +1,12 @@
 # player-updater
 
-Player Updater is a service, which allows automation of the update of a thousand music players. 
-This repository contains both a service part, to handle the requests and a command line tool, to initiate the update.
+Player Updater allows automation of the update of multiple music players. 
+
+This repository contains:
+#### Updater Service
+Middle-tier Service to process incoming requests to update the players. Supports Updater Tool requests, as well as any other means of sending HTTP requests discussed later.
+#### Updater Tool
+Command line tool to automate the update of multiple music players.
 
 ## Installation
 
@@ -21,7 +26,7 @@ Windows OS:
 $ GOOS=windows GOARCH=amd64 go build -o tool.exe
 ```
 ## Usage
-Start updater_service.exe. This would open a local listener on port 8457 to accept PUT requests to the following endpoint, where macaddress is actual player MAC-address
+Start Updater Service. This would open a local listener on port 8457 to accept PUT requests to the following endpoint, where macaddress is actual player MAC-address
 ```
 PUT /profiles/clientId:{macaddress}
 ```
