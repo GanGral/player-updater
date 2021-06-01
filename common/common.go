@@ -21,7 +21,6 @@ func GetLatestVersion(path string) Player {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Successfully Opened currentVersion.json")
 
 	// read our opened jsonFile as a byte array.
 	byteValue, _ := ioutil.ReadAll(jsonFile)
@@ -38,8 +37,7 @@ func readCsv(path string) *os.File {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Successfully Opened CSV file")
-	//defer csvFile.Close()
+
 	return csvFile
 }
 

@@ -57,7 +57,7 @@ Make sure to provide a valid body with the target profile verison of a player, f
   "profile": {    
     "applications": [
       {
-        "applicationId": "music_app"
+        "applicationId": "music_app",
         "version": "v1.4.10"
       },
       {
