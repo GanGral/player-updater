@@ -3,7 +3,7 @@
 Player Updater allows automation of the update of multiple music players. 
 Built using Go 1.16.
 
-This repository contains:
+Repository contains:
 #### Updater Service
 Middle-tier Service to process incoming requests to update the players. Supports Updater Tool requests, as well as any other means of sending HTTP requests discussed later.
 #### Updater Tool
