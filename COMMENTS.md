@@ -30,11 +30,12 @@ The comments I used were intended to get the most of internal go doc functionali
 
 
 # Things to improve on
-*Internal documentation
-*Implement proper routing
-*Implement proper token authentication
-*500 Internal Server error is not returned to client.
-*Improve tool to accept single MAC address.
+
+* Internal documentation
+* Implement proper routing
+* Implement proper token authentication
+* 500 Internal Server error is not returned to client.
+* Improve tool to accept single MAC address.
 
 
 
