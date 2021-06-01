@@ -1,9 +1,8 @@
-package main
-
-//authconfig.go
+// authconfig.go
 // specifies the AuthParameters to be passed from client application.
 // Ideally the JWT tokens can be used and OAUTH implemented.
 // For the purpose of assignement a simple JSON structure auth parameters are used by updater tool.
+package main
 
 import (
 	"encoding/json"
