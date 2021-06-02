@@ -7,6 +7,7 @@ The design I came up with includes the following:
 
 1. A middle-tier HTTP server which would accept the requests from client and forward it to the appropriate player and return back the result of update with the JSON, showing the updated player version.
 2. A tool, which would read a content of CSV file and push latest software version (JSON) to macaddresses specified. This tool would use the HTTP server endpoint to route the requests.
+3. I used mux package, so to handle parametrized queries easier (vs standart go library http package)
 
 Potentially we could allow each player have those endpoints locally but it would require maintaining each service separatly on each player, so I decided to have server in the middle.
 I didn't implement REAL routing, since I don't have players on network, but this won't be too hard to implement with the current baseline I developed.
